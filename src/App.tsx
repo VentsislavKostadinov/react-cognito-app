@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   getTokens,
   clearTokens,
@@ -13,10 +13,13 @@ function App() {
     accessToken: string;
     refreshToken: string;
   } | null>(() => getTokens());
+  
+  const hasRedirected = useRef(false);
 
   useEffect(() => {
-    // Redirect to login if not authenticated
-    if (!user) {
+    // Redirect to login if not authenticated (only once)
+    if (!user && !hasRedirected.current) {
+      hasRedirected.current = true;
       redirectToLogin();
     }
   }, [user]);

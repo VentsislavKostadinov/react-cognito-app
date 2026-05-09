@@ -9,12 +9,19 @@ export const redirectToLogin = () => {
   const CUSTOM_LOGIN_URL = import.meta.env.VITE_CUSTOM_LOGIN_URL;
   const returnUrl = encodeURIComponent(window.location.origin);
   
-  // Open custom login in a new window
+  // Try to open custom login in a new window
   const loginWindow = window.open(
     `${CUSTOM_LOGIN_URL}?returnUrl=${returnUrl}`,
     'login',
     'width=500,height=600,scrollbars=yes'
   );
+
+  // If popup was blocked, redirect the main window
+  if (!loginWindow || loginWindow.closed || typeof loginWindow.closed === 'undefined') {
+    // Popup blocked - redirect main window instead
+    window.location.href = `${CUSTOM_LOGIN_URL}?returnUrl=${returnUrl}`;
+    return;
+  }
 
   // Listen for tokens from login window
   window.addEventListener('message', (event) => {
