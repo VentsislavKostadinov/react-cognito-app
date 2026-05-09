@@ -44,12 +44,8 @@ function App() {
     );
   }
 
-  return (
-    <div>
-      <button onClick={() => auth.signinRedirect({ prompt: 'login' })}>Sign in</button>
-      <button onClick={() => signOutRedirect()}>Sign out (Cognito)</button>
-    </div>
-  );
+  auth.signinRedirect({ prompt: 'login' });
+  return <div>Redirecting to login...</div>;
 }
 
 export default App;
