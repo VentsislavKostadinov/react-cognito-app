@@ -1,51 +1,45 @@
 import "./App.css";
-import { useAuth } from "react-oidc-context";
-import { getRedirectUri } from "./utils/cognito.ts";
+import { useEffect, useState } from "react";
+import {
+  getTokens,
+  clearTokens,
+  redirectToLogin,
+} from "./services/authService";
 
 function App() {
-  const auth = useAuth();
+  const [user, setUser] = useState<{
+    email: string;
+    idToken: string;
+    accessToken: string;
+    refreshToken: string;
+  } | null>(() => getTokens());
 
-  const signOutRedirect = () => {
-    localStorage.clear();
-    sessionStorage.clear();
-    
-    document.cookie.split(";").forEach((c) => {
-      document.cookie = c
-        .replace(/^ +/, "")
-        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-    });
+  useEffect(() => {
+    // Redirect to login if not authenticated
+    if (!user) {
+      redirectToLogin();
+    }
+  }, [user]);
 
-    auth.removeUser();
-
-    const clientId = import.meta.env.VITE_CLIENT_ID;
-    const logoutUri = getRedirectUri();
-    const cognitoDomain = import.meta.env.VITE_DOMAIN;
-    window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
+  const handleSignOut = () => {
+    clearTokens();
+    setUser(null);
+    redirectToLogin();
   };
 
-  if (auth.isLoading) {
-    return <div>Loading...</div>;
+  if (!user) {
+    return <div>Opening login window...</div>;
   }
 
-  if (auth.error) {
-    return <div>Encountering error... {auth.error.message}</div>;
-  }
-
-  if (auth.isAuthenticated) {
-    return (
-      <div>
-        <pre> Hello: {auth.user?.profile.email} </pre>
-        <pre> ID Token: {auth.user?.id_token} </pre>
-        <pre> Access Token: {auth.user?.access_token} </pre>
-        <pre> Refresh Token: {auth.user?.refresh_token} </pre>
-
-        <button onClick={() => signOutRedirect()}>Sign out</button>
-      </div>
-    );
-  }
-
-  auth.signinRedirect({ prompt: 'login' });
-  return <div>Redirecting to login...</div>;
+  return (
+    <div>
+      <pre> Hello: {user.email} </pre>
+      <pre> ID Token: {user.idToken} </pre>
+      <pre> Access Token: {user.accessToken} </pre>
+      <pre> Refresh Token: {user.refreshToken} </pre>
+      <button onClick={handleSignOut}>Sign out</button>
+    </div>
+  );
 }
 
 export default App;

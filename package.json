@@ -11,10 +11,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "oidc-client-ts": "^3.5.0",
+    "amazon-cognito-identity-js": "^6.3.16",
     "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "react-oidc-context": "^3.3.1"
+    "react-dom": "^19.2.5"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
