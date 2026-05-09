@@ -1,5 +1,6 @@
 import "./App.css";
 import { useAuth } from "react-oidc-context";
+import { getRedirectUri } from "./utils/cognito.ts";
 
 function App() {
   const auth = useAuth();
@@ -17,7 +18,7 @@ function App() {
     auth.removeUser();
 
     const clientId = import.meta.env.VITE_CLIENT_ID;
-    const logoutUri = import.meta.env.VITE_REDIRECT_URI;
+    const logoutUri = getRedirectUri();
     const cognitoDomain = import.meta.env.VITE_DOMAIN;
     window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
   };
